@@ -30,10 +30,16 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 public class UtilAction {
+	JTextField textField = new JTextField();
 
-	protected static final int MinPts = 120;
 	protected static final int[] intervals = {10, 20, 30, 40, 50, 60, 70, 80, 90,
-			100, 110, 120, 130, 140, 150};
+			100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230,
+			240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360, 370,
+			380, 390, 400, 410, 420, 430, 440, 450, 460, 470, 480, 490, 500, 510,
+			520, 530, 540, 550, 560, 570, 580, 590, 600, 610, 620, 630, 640, 650,
+			660, 670, 680, 690, 700, 710, 720, 730, 740, 750, 760, 770, 780, 790,
+			800, 810, 820, 830, 840, 850, 860, 870, 880, 890, 900, 910, 920, 930,
+			940, 950, 960, 970, 980, 990, 1000};
 
 	public JButton LoadData (final Application window) {
 		final JButton loadButton = new JButton("Step 1: Load Data");
@@ -104,7 +110,6 @@ public class UtilAction {
 	}
 
 	public JTextField textFieldMinPts () {
-		JTextField textField = new JTextField();
 		Dimension textDim = new Dimension(40, 17);
 		textField.setMaximumSize(textDim);
 		textField.setMinimumSize(textDim);
@@ -128,11 +133,15 @@ public class UtilAction {
 		optimEpsButton.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseReleased (MouseEvent e) {
-
+				String minPtsValue = "";
+				minPtsValue = textFieldMinPts().getText().trim();
+				System.out.println("minPtsValue " + minPtsValue);
+				UserInterface.MinPts = (!minPtsValue.equals("")) ? Integer
+						.parseInt(minPtsValue) : UserInterface.MinPts;
 				XYDataset dataset = createDataset();
 				final JFreeChart chart = createChart(dataset);
 				ChartPanel chartPanel = new ChartPanel(chart, false);
-				chartPanel.setPreferredSize(new java.awt.Dimension(500, 300));
+				chartPanel.setPreferredSize(new java.awt.Dimension(700, 500));
 				Application.centerControlPanel.removeAll();
 				Application.centerControlPanel.add(chartPanel, BorderLayout.PAGE_START);
 				Application.centerControlPanel.revalidate();
@@ -145,7 +154,7 @@ public class UtilAction {
 				EpsilonEsitimation epsEstimation = new EpsilonEsitimation();
 				UserInterface.console.print(ProcessFile.tweets.getList().size());
 				List<Integer> m = epsEstimation.NeighboursForAtleastAtMostNeighbours(
-						ProcessFile.tweets, MinPts, intervals);
+						ProcessFile.tweets, UserInterface.MinPts, intervals);
 				for (int i = 0; i < m.size(); i++) {
 					System.out.println(intervals[i] + ", " + m.get(i).intValue());
 					series1.add(intervals[i], m.get(i).intValue());
@@ -157,10 +166,10 @@ public class UtilAction {
 
 			private JFreeChart createChart (final XYDataset dataset) {
 
-				// create the chart...
 				final JFreeChart chart = ChartFactory.createXYLineChart(
 						"Number of core points distance interval", // chart title
-						"epsilon intervals", // x axis label
+						"epsilon intervals in meters for MinPts = " + UserInterface.MinPts
+								+ " ", // x axis label
 						"number of core points on interval", // y axis label
 						dataset, // data
 						PlotOrientation.VERTICAL, true, // include legend
@@ -169,9 +178,7 @@ public class UtilAction {
 						);
 
 				chart.setBackgroundPaint(Color.white);
-
 				final XYPlot plot = chart.getXYPlot();
-
 				final XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
 				renderer.setSeriesLinesVisible(0, true);
 				renderer.setSeriesShapesVisible(0, true);
