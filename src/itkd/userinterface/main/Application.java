@@ -11,9 +11,11 @@ import java.awt.BorderLayout;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
+import javax.swing.JTextField;
 
 public class Application extends JFrame {
 	/**
@@ -41,9 +43,10 @@ public class Application extends JFrame {
 			Box iconPanel = new Box(BoxLayout.Y_AXIS);
 			iconPanel.add(window.action.LoadData(window));
 			ControlPanel leftControlPanelBox = new ControlPanel();
-			// leftControlPanelBox.setLayout(new FlowLayout(FlowLayout.LEFT));
-			leftControlPanelBox.add(window.action.calculateTheOptimalEpsilon());
-			leftControlPanelBox.add(window.action.textFieldMinPts());
+			JTextField epsValue = window.action.textFieldMinPts();
+			JButton epsButton = window.action.calculateTheOptimalEpsilon();
+			leftControlPanelBox.add(epsButton);
+			leftControlPanelBox.add(epsValue);
 			iconPanel.add(leftControlPanelBox);
 			iconPanel.add(progress);
 			leftControlPanel.add(iconPanel, BorderLayout.WEST);

@@ -58,24 +58,10 @@ public class EpsilonEsitimation {
 					distanceStart);
 			ArrayList<Tweet> secondSet = tweets.regionQuery(tweets.getList().get(i),
 					distanceEnd);
-			int auxResult = 0;
-			for (int j = 0; j < secondSet.size(); j++) {
-				boolean present = false;
-				for (int k = 0; k < firstSet.size(); k++) {
-					if (secondSet.get(j).getId().equals(firstSet.get(k).getId())) {
-						present = true;
-						break;
-					}
-				}
-				if (!present) {
-					auxResult++;
-				}
-			}
-			if (auxResult >= minpts) {
+			if (firstSet.size() < minpts && secondSet.size() >= minpts) {
 				result++;
 			}
 		}
 		return result;
 	}
-
 }
