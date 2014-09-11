@@ -348,6 +348,7 @@ public class UtilAction {
 
 	public JButton ClusterFrameDBScan (final Application window,
 			final JTextField eps, final JTextField minPts) {
+
 		final JButton frameDBScan = new JButton("Step 4: Execute Frame DBScan ");
 		frameDBScan.setMargin(new Insets(1, 1, 1, 1));
 		frameDBScan.setFont(UserInterface.font);

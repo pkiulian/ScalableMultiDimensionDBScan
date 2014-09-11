@@ -72,8 +72,10 @@ public class Application extends JFrame {
 			Box frameDBScanBox = new Box(BoxLayout.X_AXIS);
 
 			frameDBScanBox = setBoxSizes(frameDBScanBox);
+
 			JButton frameDBScan = window.action.ClusterFrameDBScan(window, epsField,
 					minPtsField);
+
 			frameDBScanBox.add(frameDBScan, BorderLayout.WEST);
 			leftControlPanelBox.add(epsButton);
 			leftControlPanelBox.add(epsValue);
