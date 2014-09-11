@@ -42,4 +42,14 @@ public class Tweets {
 		neighborPoints.addAll(index.query(e));
 		return neighborPoints;
 	}
+
+	public int size () {
+		return this.getList().size();
+	}
+
+	public void changeClusterId (Tweet p, int clusterID) {
+		p.setCluster(clusterID);
+
+	}
+
 }

@@ -8,6 +8,7 @@ import itkd.userinterface.data.structures.UserInterface;
 import itkd.userinterface.data.structures.UtilAction;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -24,13 +25,13 @@ public class Application extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	public static MainFrame mainFrame;
-	public static ControlPanel leftControlPanel;
+	public static ControlPanel menuLeftPanel;
 	public static ControlPanel centerControlPanel;
 	public static ConsolePanel consolePanel;
 	public static JProgressBar progress;
-	static int min = 0;
+	static int minProgress = 0;
 
-	static int max = 100;
+	static int maxProgress = 100;
 
 	JFileChooser fc = new JFileChooser();
 
@@ -40,21 +41,61 @@ public class Application extends JFrame {
 		try {
 			progress = new JProgressBar();
 			Application window = new Application();
+
+			Box menuLeftBox = new Box(BoxLayout.Y_AXIS);
 			Box iconPanel = new Box(BoxLayout.Y_AXIS);
-			iconPanel.add(window.action.LoadData(window));
-			ControlPanel leftControlPanelBox = new ControlPanel();
-			JTextField epsValue = window.action.textFieldMinPts();
-			JButton epsButton = window.action.calculateTheOptimalEpsilon();
+
+			Box loadBox = new Box(BoxLayout.X_AXIS);
+			loadBox = setBoxSizes(loadBox);
+			JButton loadButton = window.action.LoadData(window);
+			loadBox.add(loadButton);
+
+			Box leftControlPanelBox = new Box(BoxLayout.X_AXIS);
+			leftControlPanelBox = setBoxSizes(leftControlPanelBox);
+
+			JTextField epsValue = new JTextField();
+			epsValue = window.action.textFieldMinPts(epsValue);
+			JButton epsButton = window.action.calculateTheOptimalEpsilon(epsValue);
+
+			Box leftDBSCANBox = new Box(BoxLayout.X_AXIS);
+			JTextField epsField = new JTextField();
+			JTextField minPtsField = new JTextField();
+			epsField = window.action.textFieldMinPts(epsField);
+			minPtsField = window.action.textFieldMinPts(minPtsField);
+			leftDBSCANBox = setBoxSizes(leftDBSCANBox);
+			JButton dBScanButton = window.action.ClusterDBScan(window, epsField,
+					minPtsField);
+			leftDBSCANBox.add(dBScanButton);
+			leftDBSCANBox.add(epsField);
+			leftDBSCANBox.add(minPtsField);
+
+			Box frameDBScanBox = new Box(BoxLayout.X_AXIS);
+
+			frameDBScanBox = setBoxSizes(frameDBScanBox);
+			JButton frameDBScan = window.action.ClusterFrameDBScan();
+			frameDBScanBox.add(frameDBScan, BorderLayout.WEST);
 			leftControlPanelBox.add(epsButton);
 			leftControlPanelBox.add(epsValue);
-			iconPanel.add(leftControlPanelBox);
-			iconPanel.add(progress);
-			leftControlPanel.add(iconPanel, BorderLayout.WEST);
-			leftControlPanel.setBorder(UserInterface.border);
+			menuLeftBox.add(loadBox);
+			menuLeftBox.add(leftControlPanelBox, RIGHT_ALIGNMENT);
+			menuLeftBox.add(leftDBSCANBox, RIGHT_ALIGNMENT);
+			menuLeftBox.add(frameDBScanBox, RIGHT_ALIGNMENT);
+			menuLeftBox.add(progress);
+			menuLeftBox.add(iconPanel, BorderLayout.WEST);
+			menuLeftBox.setBorder(UserInterface.border);
+			menuLeftPanel.add(menuLeftBox, BorderLayout.LINE_START);
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private static Box setBoxSizes (Box leftControlPanelBox) {
+		Dimension size = new Dimension(350, 30);
+		leftControlPanelBox.setMaximumSize(size);
+		leftControlPanelBox.setMinimumSize(size);
+		leftControlPanelBox.setPreferredSize(size);
+		return leftControlPanelBox;
 	}
 
 	public Application () {
@@ -68,19 +109,18 @@ public class Application extends JFrame {
 		panelTitle.setTitle();
 		mainFrame = new MainFrame();
 		mainFrame.setResizable(false);
-		leftControlPanel = new ControlPanel();
-		leftControlPanel
-				.setLayout(new BoxLayout(leftControlPanel, BoxLayout.Y_AXIS));
+		menuLeftPanel = new ControlPanel();
+		menuLeftPanel.setLayout(new BoxLayout(menuLeftPanel, BoxLayout.Y_AXIS));
 
 		centerControlPanel = new ControlPanel();
 		consolePanel = new ConsolePanel();
 		consolePanel.setConsoleSpace();
 
 		mainFrame.add(panelTitle, BorderLayout.PAGE_START);
-		progress.setMinimum(min);
-		progress.setMaximum(max);
+		progress.setMinimum(minProgress);
+		progress.setMaximum(maxProgress);
 		progress.setStringPainted(true);
-		mainFrame.add(leftControlPanel, BorderLayout.LINE_START);
+		mainFrame.add(menuLeftPanel, BorderLayout.LINE_START);
 		mainFrame.add(centerControlPanel, BorderLayout.CENTER);
 		mainFrame.add(consolePanel, BorderLayout.PAGE_END);
 		mainFrame.setVisible(true);
