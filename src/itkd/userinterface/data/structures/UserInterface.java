@@ -14,4 +14,5 @@ public class UserInterface {
 	public static Font font = new Font("Comic Sans MS", Font.BOLD, 10);
 	/** Default Value */
 	public static int MinPts = 120;
+
 }

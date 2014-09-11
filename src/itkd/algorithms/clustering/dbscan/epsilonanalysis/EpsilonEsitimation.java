@@ -1,6 +1,5 @@
 package itkd.algorithms.clustering.dbscan.epsilonanalysis;
 
-import itkd.data.structures.main.Tweet;
 import itkd.data.structures.main.Tweets;
 import itkd.userinterface.data.structures.UserInterface;
 import itkd.userinterface.main.Application;
@@ -54,10 +53,12 @@ public class EpsilonEsitimation {
 		Integer result = new Integer(0);
 		tweets.prepareTheSpatialIndex(distanceEnd);
 		for (int i = 0; i < tweets.getList().size(); i++) {
-			ArrayList<Tweet> firstSet = tweets.regionQuery(tweets.getList().get(i),
-					distanceStart);
-			ArrayList<Tweet> secondSet = tweets.regionQuery(tweets.getList().get(i),
-					distanceEnd);
+			Tweets firstSet = new Tweets();
+			firstSet.getList().addAll(
+					tweets.regionQuery(tweets.getList().get(i), distanceStart));
+			Tweets secondSet = new Tweets();
+			secondSet.getList().addAll(
+					tweets.regionQuery(tweets.getList().get(i), distanceEnd));
 			if (firstSet.size() < minpts && secondSet.size() >= minpts) {
 				result++;
 			}

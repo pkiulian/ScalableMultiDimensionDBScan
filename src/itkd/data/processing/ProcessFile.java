@@ -1,66 +1,59 @@
 package itkd.data.processing;
 
-import itkd.data.structures.main.Tweet;
+import itkd.algorithms.clustering.dbscan.epsilonanalysis.DensityCluster;
+import itkd.data.read.DataFileReaderWriter;
 import itkd.data.structures.main.Tweets;
-import itkd.userinterface.data.structures.UserInterface;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ProcessFile {
 
-	public final static Tweets tweets = new Tweets();
+	/** For now these are the tweets to be clustered */
+	private static Tweets tweets = new Tweets();
 
 	private final String path;
-	private final long upperMemoryBound = Runtime.getRuntime().freeMemory();
 
 	public ProcessFile (String path) {
+		setTweets(new Tweets());
 		this.path = path;
-		processInteligentInput(path);
 
 	}
 
-	public void processInteligentInput (String path) {
+	public void readInputBasedOnMemorySize () {
+		DataFileReaderWriter f = new DataFileReaderWriter();
+		f.loadData(path, ProcessFile.getTweets());
+	}
 
-		FileInputStream fstream;
-		try {
-			fstream = new FileInputStream(path);
-			BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
-			String strLine;
-			long currentMemory = 0;
-			int count = 0;
-			while ((strLine = br.readLine()) != null
-					&& currentMemory < 0.1 * upperMemoryBound) {
-				int sizeofString = strLine.length() * 2;
-				long memoString = sizeofString * 8;
-				currentMemory += memoString;
-				count++;
-				insertDataInMemory(strLine, count);
+	public static Tweets getTweets () {
+		return tweets;
+	}
+
+	public static void setTweets (Tweets tweets) {
+		ProcessFile.tweets = tweets;
+	}
+
+	public void insertInFile (String filePath) {
+		DataFileReaderWriter f = new DataFileReaderWriter();
+		f.insetIntoFile("DBScan" + System.currentTimeMillis() + ".csv", filePath);
+	}
+
+	public static Set<Integer> getSetOfCluster () {
+		Set<Integer> ClusterIdSet = new HashSet<Integer>();
+		for (int i = 0; i < tweets.getList().size(); i++) {
+			if (tweets.getList().get(i).getCluster() != DensityCluster.NOISE) {
+				ClusterIdSet.add(tweets.getList().get(i).getCluster());
 			}
-
-			br.close();
-			UserInterface.console.print("done reading " + tweets.getList().size()
-					+ " objects and " + currentMemory + " memory used.\n");
-			UserInterface.console.print("done. \n");
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
+		return ClusterIdSet;
 	}
 
-	private void insertDataInMemory (String strLine, int count) {
-		String[] coordinates = strLine.split(",");
-		for (int i = 0; i < coordinates.length; i++) {
-			coordinates[i].trim();
+	public static int getNrOfObjectsWithGiveClusterId (int intValue) {
+		int result = 0;
+		for (int i = 0; i < tweets.getList().size(); i++) {
+			if (intValue == tweets.getList().get(i).getCluster())
+				result++;
 		}
-		Tweet t = new Tweet(Integer.toString(count),
-				new BigDecimal(coordinates[0]), new BigDecimal(coordinates[1]));
-		tweets.addTweet(t);
+		return result;
 	}
 }
