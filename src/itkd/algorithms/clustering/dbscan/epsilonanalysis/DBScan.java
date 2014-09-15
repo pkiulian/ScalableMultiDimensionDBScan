@@ -1,6 +1,6 @@
 package itkd.algorithms.clustering.dbscan.epsilonanalysis;
 
-import itkd.data.processing.ProcessFile;
+import itkd.data.processing.WorkingSet;
 import itkd.data.structures.main.Tweet;
 
 import java.util.ArrayList;
@@ -14,20 +14,20 @@ public class DBScan extends DensityCluster {
 		clusterID = 0;
 	}
 
-	public void clusterData () {
-		ProcessFile.getTweets().prepareTheSpatialIndex(epsilonSpace);
-		for (int i = 0; i < ProcessFile.getTweets().getList().size(); i++) {
-			Tweet t = ProcessFile.getTweets().getList().get(i);
+	public void clusterData (WorkingSet workingSet) {
+		workingSet.getWorkingSetTweets().prepareTheSpatialIndex(epsilonSpace);
+		for (int i = 0; i < workingSet.getWorkingSetTweets().getList().size(); i++) {
+			Tweet t = workingSet.getWorkingSetTweets().getList().get(i);
 			if (t.getCluster() == UNCLASSIFIED) {
-				if (expandCluster(t) == true) {
+				if (expandCluster(t, workingSet) == true) {
 					clusterID++;
 				}
 			}
 		}
 	}
 
-	private boolean expandCluster (Tweet dataObjectp) {
-		ArrayList<Tweet> seedListp = ProcessFile.getTweets().regionQuery(
+	private boolean expandCluster (Tweet dataObjectp, WorkingSet workingSet) {
+		ArrayList<Tweet> seedListp = workingSet.getWorkingSetTweets().regionQuery(
 				dataObjectp, epsilonSpace);
 		if (seedListp.size() < getMinPoints()) {
 			dataObjectp.setCluster(NOISE);
@@ -44,8 +44,8 @@ public class DBScan extends DensityCluster {
 		}
 		for (int j = 0; j < seedListp.size(); j++) {
 			Tweet seedListDataObjectp = seedListp.get(j);
-			ArrayList<Tweet> seedListDataObject_Neighbourhoodp = ProcessFile
-					.getTweets().regionQuery(seedListDataObjectp, epsilonSpace);
+			ArrayList<Tweet> seedListDataObject_Neighbourhoodp = workingSet
+					.getWorkingSetTweets().regionQuery(seedListDataObjectp, epsilonSpace);
 			if (seedListDataObject_Neighbourhoodp.size() >= getMinPoints()) {
 				seedListDataObjectp.setCore(true); // CORE
 				for (int i = 0; i < seedListDataObject_Neighbourhoodp.size(); i++) {
@@ -54,7 +54,7 @@ public class DBScan extends DensityCluster {
 						if (p.getCluster() == UNCLASSIFIED) {
 							seedListp.add(p);
 						}
-						ProcessFile.getTweets().changeClusterId(p, clusterID);
+						workingSet.getWorkingSetTweets().changeClusterId(p, clusterID);
 					}
 				}
 			}

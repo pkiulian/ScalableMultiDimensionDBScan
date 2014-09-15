@@ -3,7 +3,7 @@ package itkd.userinterface.data.structures;
 import itkd.algorithms.clustering.dbscan.epsilonanalysis.DBScan;
 import itkd.algorithms.clustering.dbscan.epsilonanalysis.EpsilonEsitimation;
 import itkd.algorithms.clustering.dbscan.epsilonanalysis.FDBScan;
-import itkd.data.processing.ProcessFile;
+import itkd.data.processing.WorkingSet;
 import itkd.userinterface.main.Application;
 
 import java.awt.BorderLayout;
@@ -48,6 +48,8 @@ public class UtilAction {
 	protected static final int[] intervals = {100, 200, 300, 400, 500, 600, 700,
 			800, 900, 1000};
 
+	WorkingSet workingSet = null;
+
 	public JButton LoadData (final Application window) {
 		final JButton loadButton = new JButton("Step 1: Load Data");
 		loadButton.setMargin(new Insets(1, 1, 1, 1));
@@ -76,8 +78,8 @@ public class UtilAction {
 						UserInterface.console.print("The file you read: " + file.getPath()
 								+ "\n", Color.BLUE);
 						filePath = file.getPath();
-						ProcessFile dfR = new ProcessFile(filePath);
-						dfR.readInputBasedOnMemorySize();
+						workingSet = new WorkingSet(filePath);
+						workingSet.readInputBasedOnMemorySize();
 						break;
 					case JFileChooser.CANCEL_OPTION:
 						JOptionPane.showMessageDialog(window, "Cancelled", "Application",
@@ -161,9 +163,9 @@ public class UtilAction {
 				final XYSeries series = new XYSeries("evolution of core points");
 
 				EpsilonEsitimation epsEstimation = new EpsilonEsitimation();
-				UserInterface.console.print(ProcessFile.getTweets().getList().size());
+				UserInterface.console.print(workingSet.getWorkingSetTweets().size());
 				List<Integer> m = epsEstimation.NeighboursForAtleastAtMostNeighbours(
-						ProcessFile.getTweets(), UserInterface.MinPts, intervals);
+						workingSet.getWorkingSetTweets(), UserInterface.MinPts, intervals);
 				for (int i = 0; i < m.size(); i++) {
 					System.out.println(intervals[i] + ", " + m.get(i).intValue());
 					series.add(intervals[i], m.get(i).intValue());
@@ -274,18 +276,18 @@ public class UtilAction {
 									"Selected: " + fc.getSelectedFile(), "Application",
 									JOptionPane.OK_OPTION);
 							File file = fc.getSelectedFile();
-							UserInterface.console.print(
-									"The file you read: " + file.getPath() + "\n", Color.BLUE);
+							UserInterface.console.print("The file you read for clustering: "
+									+ file.getPath() + "\n", Color.BLUE);
 							filePath = file.getPath();
-							ProcessFile dfR = new ProcessFile(filePath);
-							dfR.readInputBasedOnMemorySize();
+							workingSet = new WorkingSet(filePath);
+							workingSet.readInputBasedOnMemorySize();
 							long start = System.currentTimeMillis();
-							dbScan.clusterData();
+							dbScan.clusterData(workingSet);
 							long end = System.currentTimeMillis();
 							UserInterface.console.print("needed time for DBScan: "
 									+ (end - start) + " miliseconds \n");
 							filePath = setFilePath(filePath);
-							dfR.insertInFile(filePath);
+							workingSet.insertInFile(filePath);
 							DefaultCategoryDataset dataset = createBarDataSet();
 							final JFreeChart chart = createChartBar(dataset);
 							ChartPanel chartPanel = new ChartPanel(chart, false);
@@ -326,11 +328,10 @@ public class UtilAction {
 
 	protected DefaultCategoryDataset createBarDataSet () {
 		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-		Set<Integer> ClusterIdSet = ProcessFile.getSetOfCluster();
-		UserInterface.console.println("CLusters:  " + ClusterIdSet.size());
+		Set<Integer> ClusterIdSet = workingSet.getSetOfCluster();
+		UserInterface.console.println("Clusters:  " + ClusterIdSet.size()); // ?
 		for (Integer i : ClusterIdSet) {
-			int nrOfTweets = ProcessFile
-					.getNrOfObjectsWithGiveClusterId(i.intValue());
+			int nrOfTweets = workingSet.getNrOfObjectsWithGiveClusterId(i.intValue());
 			dataset.setValue(nrOfTweets, "number of tweets", i);
 		}
 		return dataset;
@@ -402,16 +403,10 @@ public class UtilAction {
 							UserInterface.console.print(
 									"The file you read: " + file.getPath() + "\n", Color.BLUE);
 							filePath = file.getPath();
-							ProcessFile dfR = new ProcessFile(filePath);
-							frameDBScan.clusterData();
-							// dfR.readInputBasedOnMemorySize();
-							// long start = System.currentTimeMillis();
-							// dbScan.clusterData();
-							// long end = System.currentTimeMillis();
-							// UserInterface.console.print("needed time for DBScan: "
-							// + (end - start) + " miliseconds \n");
-							// filePath = setFilePath(filePath);
-							// dfR.insertInFile(filePath);
+							filePath = setFilePath(filePath);
+							workingSet = new WorkingSet(filePath);
+
+							frameDBScan.clusterData(filePath, workingSet);
 
 							DefaultCategoryDataset dataset = createBarDataSet();
 							final JFreeChart chart = createChartBar(dataset);

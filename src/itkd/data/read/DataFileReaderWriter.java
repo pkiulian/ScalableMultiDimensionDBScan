@@ -1,6 +1,5 @@
 package itkd.data.read;
 
-import itkd.data.processing.ProcessFile;
 import itkd.data.structures.main.Tweet;
 import itkd.data.structures.main.Tweets;
 import itkd.userinterface.data.structures.UserInterface;
@@ -63,13 +62,13 @@ public class DataFileReaderWriter {
 		tweets.addTweet(t);
 	}
 
-	public void insetIntoFile (String fileName, String filePath) {
+	public void insetIntoFile (String fileName, String filePath, Tweets tweets) {
 		File file = new File(filePath + "" + fileName);
 		try {
 			FileOutputStream fos = new FileOutputStream(file);
 			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
-			for (int i = 0; i < ProcessFile.getTweets().getList().size(); i++) {
-				Tweet t = ProcessFile.getTweets().getList().get(i);
+			for (int i = 0; i < tweets.getList().size(); i++) {
+				Tweet t = tweets.getList().get(i);
 				bw.write(t.getId() + "," + t.get1Dimension() + "," + t.get2Dimension()
 						+ "," + t.getCluster());
 				bw.newLine();
